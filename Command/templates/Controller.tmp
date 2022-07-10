@@ -1,0 +1,20 @@
+<?php
+
+namespace Module\{%uModuleName%}\Controller;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use \Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+#[Route('/{%lModuleName%}')]
+class {%controllerName%} extends AbstractController
+{
+    #[Route('/')]
+    public function getList(): Response
+    {
+        return $this->json([
+            'code' => Response::HTTP_OK,
+            'message' => 'hello module {%lModuleName%}'
+        ]);
+    }
+}

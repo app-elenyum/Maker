@@ -1,0 +1,24 @@
+<?php
+
+namespace Module\{%uModuleName%}\Repository;
+
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Module\{%uModuleName%}\Entity\{%entityName%};
+
+/**
+ * Class {%repositoryName%}
+ * @package Module\{%uModuleName%}\Repository
+ *
+ * @method {%entityName%}|null find($id, $lockMode = null, $lockVersion = null)
+ * @method {%entityName%}|null findOneBy(array $criteria, array $orderBy = null)
+ * @method {%entityName%}[]    findAll()
+ * @method {%entityName%}[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
+class {%repositoryName%} extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, {%entityName%}::class);
+    }
+}
