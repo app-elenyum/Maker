@@ -1,6 +1,6 @@
 #Модуль создания и подключения модулей для elenyum
 
-Проекта <a href='https://github.com/elenyum-ru/elenyum'>elenyum</a>
+Проект <a href='https://github.com/elenyum-ru/elenyum'>elenyum</a>
 
 [<img alt="N|Solid" height="100" src="https://images.assetsdelivery.com/compings_v2/arbuzu/arbuzu1606/arbuzu160600041.jpg"/>](https://github.com/elenyum-ru/elenyum)
 
