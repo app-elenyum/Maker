@@ -20,12 +20,6 @@ class InstallModule extends Command
     protected static $defaultName = 'module:install';
     protected static $defaultDescription = 'This command install module from https://github.com/elenyum-ru';
 
-    public function __construct(
-        private Filesystem $filesystem
-    ) {
-        parent::__construct();
-    }
-
     protected function configure()
     {
         $this
@@ -39,7 +33,7 @@ class InstallModule extends Command
 
         $token = $_ENV['GITHUB_TOKEN'] ?? $input->getOption('token');
         $command = "git clone https://{$token}@github.com/elenyum-ru/{$moduleName}.git ". __DIR__ ."/../../{$moduleName}";
-        $this->filesystem->remove(__DIR__ . "/../../{$moduleName}/.git");
+
         shell_exec($command);
         $this->addDoctrineConfigure($moduleName);
 
