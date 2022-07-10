@@ -15,6 +15,6 @@
 Для подключения нового модуля:
 - php bin\console module:install moduleName --token=youGitHubToken
 - moduleName - название модуля
-- --token - gitHub токен (подробнее тут: https://github.com/settings/tokens)
+- --token - gitHub токен (можно получить тут: https://github.com/settings/tokens)
 
 
