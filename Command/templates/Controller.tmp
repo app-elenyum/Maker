@@ -4,6 +4,7 @@ namespace Module\{%uModuleName%}\Controller;
 
 use Exception;
 use App\Controller\BaseController;
+use Module\Img\Repository\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
