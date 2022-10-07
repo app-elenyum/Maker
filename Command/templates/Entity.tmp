@@ -2,12 +2,13 @@
 
 namespace Module\{%uModuleName%}\Entity;
 
+use JsonSerializable;
 use Doctrine\ORM\Mapping as ORM;
 use Module\{%uModuleName%}\Repository\{%repositoryName%};
 
 #[ORM\Entity(repositoryClass: {%repositoryName%}::class)]
 #[ORM\Table(name: '{%lModuleName%}')]
-class {%entityName%}
+class {%entityName%} implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,5 +29,13 @@ class {%entityName%}
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName()
+        ];
     }
 }

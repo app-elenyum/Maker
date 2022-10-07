@@ -144,8 +144,9 @@ class {%controllerName%} extends BaseController
             $this->getEntityManager()->flush();
 
             return $this->json([
+                'success' => true,
                 'code' => Response::HTTP_OK,
-                'item' => $item,
+                'item' => ['id' => $id],
             ]);
         } catch (Exception $e) {
             return $this->json([
