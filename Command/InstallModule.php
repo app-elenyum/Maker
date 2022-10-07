@@ -2,24 +2,22 @@
 
 namespace Module\Maker\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
+#[AsCommand(
+    name: 'module:install',
+    description: 'This command install module from https://github.com/elenyum-ru',
+    aliases: ['md:i'],
+    hidden: false
+)]
 class InstallModule extends Command
 {
-    protected static $defaultName = 'module:install';
-    protected static $defaultDescription = 'This command install module from https://github.com/elenyum-ru';
-
     protected function configure()
     {
         $this

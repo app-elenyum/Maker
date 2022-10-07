@@ -2,6 +2,7 @@
 
 namespace Module\Maker\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,13 +13,16 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Yaml\Yaml;
 
+#[AsCommand(
+    name: 'module:create',
+    description: 'This command create new empty module',
+    aliases: ['md:c'],
+    hidden: false
+)]
 class CreateModule extends Command
 {
-    protected static $defaultName = 'module:create';
-    protected static $defaultDescription = 'This command create new empty module';
-
     public function __construct(
-        private Filesystem $filesystem
+        private readonly Filesystem $filesystem
     ) {
         parent::__construct();
     }
@@ -28,7 +32,7 @@ class CreateModule extends Command
         $this->addArgument('moduleName', InputArgument::REQUIRED, 'The module name of the module');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $moduleName = $input->getArgument('moduleName');
 
@@ -37,15 +41,10 @@ class CreateModule extends Command
         $this->createDir($dir.'/'.$moduleName, 'Controller');
         $io = new SymfonyStyle($input, $output);
 
-        $nameController = $io->ask('Enter name controller', 'IndexController');
-        $this->copyTemplateToModule(
-            $moduleName, 'Controller', $nameController, 'Controller',
-            ['{%uModuleName%}', '{%lModuleName%}', '{%controllerName%}'],
-            [ucfirst($moduleName), lcfirst($moduleName), $nameController]
-        );
-
         $nameEntity = $io->ask('Enter name entity', 'EntityBase');
         $nameRepository = $nameEntity . 'Repository';
+
+        $nameController = $io->ask('Enter name controller', 'IndexController');
 
         $this->createDir($dir.'/'.$moduleName, 'Entity');
         $this->copyTemplateToModule(
@@ -61,6 +60,17 @@ class CreateModule extends Command
             ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
+        $this->copyTemplateToModule(
+            $moduleName, 'PaginatorInterface', 'PaginatorInterface', 'Repository',
+            ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
+            [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
+        );
+        $this->copyTemplateToModule(
+            $moduleName, 'Controller', $nameController, 'Controller',
+            ['{%uModuleName%}', '{%lModuleName%}', '{%controllerName%}', '{%repositoryName%}','{%entityName%}'],
+            [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity]
+        );
+
         $this->createDir($dir.'/'.$moduleName, 'Service');
         $this->addDoctrineConfigure($moduleName);
 
@@ -88,7 +98,7 @@ class CreateModule extends Command
         $value = Yaml::parseFile($configDoctrine);
         $value['doctrine']['dbal']['connections'][lcfirst($moduleName)]['url'] = "%env(resolve:DATABASE_URL)%";
         $value['doctrine']['orm']['entity_managers'][lcfirst($moduleName)] = [
-            "connection" => "users",
+            "connection" => lcfirst($moduleName),
             "mappings" => [
                 ucfirst($moduleName) => [
                     "is_bundle" => false,

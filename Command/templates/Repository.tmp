@@ -5,6 +5,7 @@ namespace Module\{%uModuleName%}\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\{%uModuleName%}\Entity\{%entityName%};
+use App\Util\Paginator;
 
 /**
  * Class {%repositoryName%}
@@ -15,10 +16,20 @@ use Module\{%uModuleName%}\Entity\{%entityName%};
  * @method {%entityName%}[]    findAll()
  * @method {%entityName%}[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class {%repositoryName%} extends ServiceEntityRepository
+class {%repositoryName%} extends ServiceEntityRepository implements PaginatorInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, {%entityName%}::class);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getPaginator(int $page, array $data = []): Paginator
+    {
+        $qb = $this->createQueryBuilder('{%lModuleName%}');
+
+        return (new Paginator($qb, Paginator::PAGE_SIZE))->paginate($page);
     }
 }

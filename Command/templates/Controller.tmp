@@ -2,19 +2,152 @@
 
 namespace Module\{%uModuleName%}\Controller;
 
+use Exception;
+use App\Controller\BaseController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use \Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/{%lModuleName%}')]
-class {%controllerName%} extends AbstractController
+class {%controllerName%} extends BaseController
 {
-    #[Route('/')]
-    public function getList(): Response
+    protected const DATABASE = '{%lModuleName%}';
+    protected const ENTITY = 'Module\{%uModuleName%}\Entity\{%entityName%}';
+
+    #[Route(path: '/', name: '{%lModuleName%}List', methods: Request::METHOD_GET)]
+    public function list(Request $request): Response
     {
-        return $this->json([
-            'code' => Response::HTTP_OK,
-            'message' => 'hello module {%lModuleName%}'
-        ]);
+        try {
+            $repository = $this->getRepository();
+            if (!$repository instanceof PaginatorInterface) {
+                throw new Exception('Repository not implements PaginatorInterface');
+            }
+            $page = $request->query->getInt('page', 1);
+            $paginator = $repository->getPaginator($page);
+            return $this->json([
+                'success' => true,
+                'code' => Response::HTTP_OK,
+                'paginator' => [
+                    'first' => 1,
+                    'next' => $paginator->getNextPage(),
+                    'previous' => $paginator->getPreviousPage(),
+                    'last' => $paginator->getLastPage(),
+                    'current' => $paginator->getCurrentPage(),
+                ],
+                'items' => $paginator->getResults()
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'code' => Response::HTTP_EXPECTATION_FAILED,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    #[Route('/{id<\d+>}', name: '{%lModuleName%}Get', methods: Request::METHOD_GET)]
+    public function get(int $id): Response
+    {
+        try {
+            $repository = $this->getRepository();
+            $item = $repository->findOneBy(['id' => $id]);
+            if ($item === null) {
+                return $this->json([
+                    'success' => false,
+                    'code' => Response::HTTP_NOT_FOUND,
+                ]);
+            }
+
+            return $this->json([
+                'success' => true,
+                'code' => Response::HTTP_OK,
+                'item' => $item,
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'code' => Response::HTTP_EXPECTATION_FAILED,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    //POST - Create a REST API resource
+    #[Route('/', name: '{%lModuleName%}Post', methods: Request::METHOD_POST)]
+    public function post(Request $request): Response
+    {
+        try {
+            $item = $this->toEntity(self::ENTITY, $request->getContent());
+
+            return $this->json([
+                'success' => true,
+                'code' => Response::HTTP_OK,
+                'item' => $item,
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'code' => Response::HTTP_EXPECTATION_FAILED,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    //Update a REST API resource
+    #[Route('/{id<\d+>}', name: '{%lModuleName%}Put', methods: Request::METHOD_PUT)]
+    public function put(int $id, Request $request): Response
+    {
+        try {
+            $repository = $this->getRepository();
+            $item = $repository->findOneBy(['id' => $id]);
+            if ($item === null) {
+                return $this->json([
+                    'success' => false,
+                    'code' => Response::HTTP_NOT_FOUND,
+                ]);
+            }
+
+            $this->updateEntity($item, $request->getContent());
+
+            return $this->json([
+                'success' => true,
+                'code' => Response::HTTP_OK,
+                'item' => $item,
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'code' => Response::HTTP_EXPECTATION_FAILED,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    //Delete a REST API resource
+    #[Route('/{id<\d+>}', name: '{%lModuleName%}Delete', methods: Request::METHOD_DELETE)]
+    public function delete(int $id): Response
+    {
+        try {
+            $repository = $this->getRepository();
+            $item = $repository->findOneBy(['id' => $id]);
+            if ($item === null) {
+                return $this->json([
+                    'success' => false,
+                    'code' => Response::HTTP_NOT_FOUND,
+                ]);
+            }
+            $this->getEntityManager()->remove($item);
+
+            return $this->json([
+                'code' => Response::HTTP_OK,
+                'item' => $item,
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'code' => Response::HTTP_EXPECTATION_FAILED,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }
