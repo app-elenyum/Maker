@@ -79,6 +79,8 @@ class {%controllerName%} extends BaseController
     {
         try {
             $item = $this->toEntity(self::ENTITY, $request->getContent());
+            $this->getEntityManager()->persist($item);
+            $this->getEntityManager()->flush();
 
             return $this->json([
                 'success' => true,
@@ -109,6 +111,7 @@ class {%controllerName%} extends BaseController
             }
 
             $this->updateEntity($item, $request->getContent());
+            $this->getEntityManager()->flush();
 
             return $this->json([
                 'success' => true,
@@ -138,6 +141,7 @@ class {%controllerName%} extends BaseController
                 ]);
             }
             $this->getEntityManager()->remove($item);
+            $this->getEntityManager()->flush();
 
             return $this->json([
                 'code' => Response::HTTP_OK,
