@@ -67,7 +67,7 @@ class CreateModule extends Command
         );
 
         $this->createDir($dir.'/'.$moduleName, 'Service');
-//        $this->addDoctrineConfigure($moduleName);
+        $this->addDoctrineConfigure($moduleName);
 
         $output->writeln('Module created: '.$moduleName);
 

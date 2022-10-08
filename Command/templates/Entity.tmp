@@ -35,7 +35,6 @@ class {%entityName%} implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'name' => $this->getName()
         ];
     }
 }
