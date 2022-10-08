@@ -3,8 +3,12 @@
 namespace Module\{%uModuleName%}\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Module\{%uModuleName%}\Entity\{%entityName%};
+use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\GetItemForDeleteInterface;
+use App\Repository\GetItemForPutInterface;
+use App\Repository\GetItemInterface;
+use App\Repository\PaginatorInterface;
 use App\Util\Paginator;
 
 /**
@@ -16,7 +20,9 @@ use App\Util\Paginator;
  * @method {%entityName%}[]    findAll()
  * @method {%entityName%}[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class {%repositoryName%} extends ServiceEntityRepository implements PaginatorInterface
+class {%repositoryName%} extends
+    ServiceEntityRepository
+    implements PaginatorInterface, GetItemInterface, GetItemForDeleteInterface, GetItemForPutInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -28,8 +34,23 @@ class {%repositoryName%} extends ServiceEntityRepository implements PaginatorInt
      */
     public function getPaginator(int $page, array $data = []): Paginator
     {
-        $qb = $this->createQueryBuilder('{%lModuleName%}');
+        $qb = $this->createQueryBuilder('img');
 
         return (new Paginator($qb, Paginator::PAGE_SIZE))->paginate($page);
+    }
+
+    public function getItem(int $id): ?object
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
+
+    public function getItemForDelete(int $id): ?object
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
+
+    public function getItemForPut(int $id): ?object
+    {
+        return $this->findOneBy(['id' => $id]);
     }
 }

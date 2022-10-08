@@ -61,18 +61,13 @@ class CreateModule extends Command
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
         $this->copyTemplateToModule(
-            $moduleName, 'PaginatorInterface', 'PaginatorInterface', 'Repository',
-            ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
-            [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
-        );
-        $this->copyTemplateToModule(
             $moduleName, 'Controller', $nameController, 'Controller',
             ['{%uModuleName%}', '{%lModuleName%}', '{%controllerName%}', '{%repositoryName%}','{%entityName%}'],
             [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity]
         );
 
         $this->createDir($dir.'/'.$moduleName, 'Service');
-        $this->addDoctrineConfigure($moduleName);
+//        $this->addDoctrineConfigure($moduleName);
 
         $output->writeln('Module created: '.$moduleName);
 
