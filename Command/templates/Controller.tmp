@@ -2,11 +2,11 @@
 
 namespace Module\{%uModuleName%}\Controller;
 
-use App\Controller\BaseController;
+use App\Controller\{%controllerType%};
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/{%lModuleName%}')]
-class {%controllerName%} extends BaseController
+#[Route('/{%lModuleName%}', name: '{%lModuleName%}')]
+class {%controllerName%} extends {%controllerType%}
 {
     protected const DATABASE = '{%lModuleName%}';
     protected const ENTITY = 'Module\{%uModuleName%}\Entity\{%entityName%}';

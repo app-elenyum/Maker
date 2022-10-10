@@ -42,9 +42,11 @@ class CreateModule extends Command
         $io = new SymfonyStyle($input, $output);
 
         $nameEntity = $io->ask('Enter name entity', 'EntityBase');
-        $nameRepository = $nameEntity . 'Repository';
+        $nameRepository = $nameEntity.'Repository';
 
         $nameController = $io->ask('Enter name controller', 'IndexController');
+        $type = $io->choice('Enter controller type', ['crud', 'base']);
+        $controllerType = $type === 'crud' ? 'BaseCrudController' : 'BaseController';
 
         $this->createDir($dir.'/'.$moduleName, 'Entity');
         $this->copyTemplateToModule(
@@ -52,7 +54,6 @@ class CreateModule extends Command
             ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
-
 
         $this->createDir($dir.'/'.$moduleName, 'Repository');
         $this->copyTemplateToModule(
@@ -62,8 +63,15 @@ class CreateModule extends Command
         );
         $this->copyTemplateToModule(
             $moduleName, 'Controller', $nameController, 'Controller',
-            ['{%uModuleName%}', '{%lModuleName%}', '{%controllerName%}', '{%repositoryName%}','{%entityName%}'],
-            [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity]
+            [
+                '{%uModuleName%}',
+                '{%lModuleName%}',
+                '{%controllerName%}',
+                '{%repositoryName%}',
+                '{%entityName%}',
+                '{%controllerType%}',
+            ],
+            [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity, $controllerType]
         );
 
         $this->createDir($dir.'/'.$moduleName, 'Service');
