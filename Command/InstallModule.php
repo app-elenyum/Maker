@@ -25,7 +25,7 @@ class InstallModule extends Command
             ->addOption('token', 't', InputOption::VALUE_OPTIONAL, 'Github token');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $moduleName = ucfirst($input->getArgument('moduleName'));
 

@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/{%lModuleName%}', name: '{%lModuleName%}')]
 class {%controllerName%} extends {%controllerType%}
 {
+    protected const NAME = '{%lModuleName%}';
     protected const DATABASE = '{%lModuleName%}';
     protected const ENTITY = 'Module\{%uModuleName%}\Entity\{%entityName%}';
 }
