@@ -5,6 +5,7 @@ namespace Module\{%uModuleName%}\Entity;
 use JsonSerializable;
 use Doctrine\ORM\Mapping as ORM;
 use Module\{%uModuleName%}\Repository\{%repositoryName%};
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: {%repositoryName%}::class)]
 #[ORM\Table(name: '{%lModuleName%}')]

@@ -46,7 +46,7 @@ class CreateModule extends Command
 
         $nameController = $io->ask('Enter name controller', 'IndexController');
         $type = $io->choice('Enter controller type', ['crud', 'base']);
-        $controllerType = $type === 'crud' ? 'BaseCrudController' : 'BaseController';
+        $controllerType = $type === 'crud' ? 'CrudBaseController' : 'BaseController';
 
         $this->createDir($dir.'/'.$moduleName, 'Entity');
         $this->copyTemplateToModule(
