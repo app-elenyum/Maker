@@ -46,7 +46,6 @@ class CreateModule extends Command
 
         $nameController = $io->ask('Enter name controller', 'IndexController');
         $type = $io->choice('Enter controller type', ['crud', 'base']);
-        $controllerType = $type === 'crud' ? 'CrudBaseController' : 'BaseController';
 
         $this->createDir($dir.'/'.$moduleName, 'Entity');
         $this->copyTemplateToModule(
@@ -71,7 +70,7 @@ class CreateModule extends Command
                 '{%entityName%}',
                 '{%controllerType%}',
             ],
-            [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity, $controllerType]
+            [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity]
         );
 
         $this->createDir($dir.'/'.$moduleName, 'Service');

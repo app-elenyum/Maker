@@ -6,7 +6,7 @@ use App\Controller\{%controllerType%};
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/{%lModuleName%}', name: '{%lModuleName%}')]
-class {%controllerName%} extends {%controllerType%}
+class {%controllerName%} extends BaseController
 {
     protected const NAME = '{%lModuleName%}';
     protected const DATABASE = '{%lModuleName%}';
