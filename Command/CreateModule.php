@@ -34,11 +34,15 @@ class CreateModule extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $version = 'v1';
         $moduleName = $input->getArgument('moduleName');
 
+
         $dir = __DIR__.'/../../';
+        $fullPath = $dir.'/'.ucfirst($version).'/'.$moduleName;
+
         $this->createDir($dir, $moduleName);
-        $this->createDir($dir.'/'.$moduleName, 'Controller');
+        $this->createDir($fullPath, 'Controller');
         $io = new SymfonyStyle($input, $output);
 
         $nameEntity = $io->ask('Enter name entity', 'EntityBase');
@@ -47,34 +51,44 @@ class CreateModule extends Command
         $nameController = $io->ask('Enter name controller', 'IndexController');
         $type = $io->choice('Enter controller type', ['crud', 'base']);
 
-        $this->createDir($dir.'/'.$moduleName, 'Entity');
+        $this->createDir($fullPath, 'Entity');
         $this->copyTemplateToModule(
-            $moduleName, 'Entity', $nameEntity, 'Entity',
+            $moduleName, 'Entity', $nameEntity, ucfirst($version).'/Entity',
             ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
 
-        $this->createDir($dir.'/'.$moduleName, 'Repository');
+        $this->createDir($fullPath, 'Repository');
         $this->copyTemplateToModule(
-            $moduleName, 'Repository', $nameRepository, 'Repository',
+            $moduleName, 'Repository', $nameRepository, ucfirst($version).'Repository',
             ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
-        $this->copyTemplateToModule(
-            $moduleName, 'Controller', $nameController, 'Controller',
-            [
-                '{%uModuleName%}',
-                '{%lModuleName%}',
-                '{%controllerName%}',
-                '{%repositoryName%}',
-                '{%entityName%}',
-                '{%controllerType%}',
-            ],
-            [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity]
-        );
 
-        $this->createDir($dir.'/'.$moduleName, 'Service');
-        $this->addDoctrineConfigure($moduleName);
+        $controllers = [
+            'DeleteController.php',
+            'GetController.php',
+            'ListController.php',
+            'PostController.php',
+            'PutController.php',
+        ];
+        foreach ($controllers as $controller) {
+            $this->copyTemplateToModule(
+                $moduleName, $controller, $nameController, ucfirst($version).'Controller',
+                [
+                    '{%uModuleName%}',
+                    '{%lModuleName%}',
+                    '{%controllerName%}',
+                    '{%repositoryName%}',
+                    '{%entityName%}',
+                    '{%controllerType%}',
+                ],
+                [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity]
+            );
+        }
+
+        $this->createDir($fullPath, 'Service');
+//        $this->addDoctrineConfigure($moduleName);
 
         $output->writeln('Module created: '.$moduleName);
 

@@ -1,0 +1,59 @@
+<?php
+
+namespace Module\News\V1\Controller;
+
+use App\Controller\BaseController;
+use App\Validator\ValidationException;
+use Exception;
+use Module\{%uModuleName%}\V1\Entity\{%entityName%};
+use Module\{%uModuleName%}\V1\Service\{%entityName%}Service;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Attributes as OA;
+
+//POST - Create a REST API resource
+#[OA\RequestBody(
+    description: 'Model {%lModuleName%} for add data',
+    content: new OA\JsonContent(
+        ref: new Model(type: News::class, groups: ["post"])
+    )
+)]
+#[Security(name: 'Bearer')]
+#[OA\Tag(name: '{%lModuleName%}')]
+#[Route(path: '/v1/{%lModuleName%}', name: '{%lModuleName%}Post', methods: Request::METHOD_POST)]
+class PostController extends BaseController
+{
+    /**
+     * @throws Exception
+     */
+    final public function __invoke(Request $request, {%entityName%}Service $service): Response
+    {
+        try {
+            $item = $service->toEntity($request->getContent());
+            $service->getEntityManager()->persist($item);
+            $service->getEntityManager()->flush();
+
+            return $this->json([
+                'success' => true,
+                'code' => Response::HTTP_OK,
+                'item' => $item,
+            ]);
+        } catch (ValidationException $e) {
+            return $this->json([
+                'success' => false,
+                'code' => Response::HTTP_EXPECTATION_FAILED,
+                'message' => $e->getMessage(),
+                'errors' => json_decode($e->getMessage()),
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'code' => Response::HTTP_EXPECTATION_FAILED,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+}

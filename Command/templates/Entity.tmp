@@ -32,6 +32,9 @@ class {%entityName%} implements JsonSerializable
         $this->id = $id;
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerialize(): array
     {
         return [

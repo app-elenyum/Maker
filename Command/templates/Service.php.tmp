@@ -1,0 +1,12 @@
+<?php
+
+namespace Module\Maker\Command\templates;
+
+use App\Service\BaseService;
+use Module\News\V1\Entity\News;
+
+class {%entityName%}Service extends BaseService
+{
+    protected const DATABASE = '{%lModuleName%}';
+    protected const ENTITY = 'Module\{%uModuleName%}\Entity\{%entityName%}';
+}
