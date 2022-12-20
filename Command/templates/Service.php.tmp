@@ -7,5 +7,5 @@ use Module\{%uModuleName%}\V1\Entity\{%entityName%};
 class {%entityName%}Service extends BaseService
 {
     protected const DATABASE = '{%lModuleName%}';
-    protected const ENTITY = 'Module\{%uModuleName%}\Entity\{%entityName%}';
+    protected const ENTITY = 'Module\{%uModuleName%}\V1\Entity\{%entityName%}';
 }

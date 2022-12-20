@@ -123,8 +123,8 @@ class CreateModule extends Command
                 ucfirst($moduleName) => [
                     "is_bundle" => false,
                     "type" => "attribute",
-                    "dir" => '%kernel.project_dir%/module/'.ucfirst($moduleName).'/Entity',
-                    "prefix" => 'Module\\'.ucfirst($moduleName).'\Entity',
+                    "dir" => '%kernel.project_dir%/module/'.ucfirst($moduleName).'/V1/Entity',
+                    "prefix" => 'Module\\'.ucfirst($moduleName).'\V1\Entity',
                     "alias" => ucfirst($moduleName)."Module",
                 ],
             ],
