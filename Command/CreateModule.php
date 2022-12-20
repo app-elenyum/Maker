@@ -39,28 +39,33 @@ class CreateModule extends Command
 
 
         $dir = __DIR__.'/../../';
-        $fullPath = $dir.'/'.ucfirst($version).'/'.$moduleName;
+        $fullPath = $dir.'/'.$moduleName.'/'.ucfirst($version);
 
         $this->createDir($dir, $moduleName);
         $this->createDir($fullPath, 'Controller');
         $io = new SymfonyStyle($input, $output);
 
-        $nameEntity = $io->ask('Enter name entity', 'EntityBase');
+        $nameEntity = $io->ask('Enter name entity', $moduleName);
         $nameRepository = $nameEntity.'Repository';
-
-        $nameController = $io->ask('Enter name controller', 'IndexController');
-        $type = $io->choice('Enter controller type', ['crud', 'base']);
 
         $this->createDir($fullPath, 'Entity');
         $this->copyTemplateToModule(
-            $moduleName, 'Entity', $nameEntity, ucfirst($version).'/Entity',
+            $moduleName, 'Entity.php', $nameEntity.'.php', ucfirst($version).'/Entity',
             ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
 
         $this->createDir($fullPath, 'Repository');
         $this->copyTemplateToModule(
-            $moduleName, 'Repository', $nameRepository, ucfirst($version).'Repository',
+            $moduleName, 'Repository.php', $nameRepository.'.php', ucfirst($version).'/Repository',
+            ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
+            [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
+        );
+
+        $nameService = $nameEntity.'Service';
+        $this->createDir($fullPath, 'Service');
+        $this->copyTemplateToModule(
+            $moduleName, 'Service.php', $nameService.'.php', ucfirst($version).'/Service',
             ['{%uModuleName%}', '{%lModuleName%}', '{%entityName%}', '{%repositoryName%}'],
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
@@ -74,21 +79,20 @@ class CreateModule extends Command
         ];
         foreach ($controllers as $controller) {
             $this->copyTemplateToModule(
-                $moduleName, $controller, $nameController, ucfirst($version).'Controller',
+                $moduleName, $controller, $controller, ucfirst($version).'/Controller',
                 [
                     '{%uModuleName%}',
                     '{%lModuleName%}',
-                    '{%controllerName%}',
                     '{%repositoryName%}',
                     '{%entityName%}',
                     '{%controllerType%}',
                 ],
-                [ucfirst($moduleName), lcfirst($moduleName), $nameController, $nameRepository, $nameEntity]
+                [ucfirst($moduleName), lcfirst($moduleName), $nameRepository, $nameEntity]
             );
         }
 
         $this->createDir($fullPath, 'Service');
-//        $this->addDoctrineConfigure($moduleName);
+        $this->addDoctrineConfigure($moduleName);
 
         $output->writeln('Module created: '.$moduleName);
 
@@ -105,7 +109,7 @@ class CreateModule extends Command
     ): void {
         $controller = file_get_contents(__DIR__.'/templates/'.$templateName.'.tmp');
         $content = str_replace($search, $replace, $controller);
-        $this->filesystem->appendToFile(__DIR__.'/../../'.$moduleName.'/'.$path.'/'.$fileName.'.php', $content);
+        $this->filesystem->appendToFile(__DIR__.'/../../'.$moduleName.'/'.$path.'/'.$fileName, $content);
     }
 
     private function addDoctrineConfigure(string $moduleName): void

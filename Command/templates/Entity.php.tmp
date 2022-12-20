@@ -1,11 +1,12 @@
 <?php
 
-namespace Module\{%uModuleName%}\Entity;
+namespace Module\{%uModuleName%}\V1\Entity;
 
 use JsonSerializable;
 use Doctrine\ORM\Mapping as ORM;
 use Module\{%uModuleName%}\Repository\{%repositoryName%};
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: {%repositoryName%}::class)]
 #[ORM\Table(name: '{%lModuleName%}')]
@@ -14,6 +15,7 @@ class {%entityName%} implements JsonSerializable
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["get", "list", "post", "put"])]
     private int $id;
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Module\News\V1\Controller;
+namespace Module\{%uModuleName%}\V1\Controller;
 
 use App\Controller\BaseController;
 use App\Repository\GetItemForPutInterface;
@@ -22,6 +22,43 @@ use Nelmio\ApiDocBundle\Annotation\Security;
         ref: new Model(type: {%entityName%}::class, groups: ["put"])
     )
 )]
+#[OA\Response(
+    response: 200,
+    description: 'Returns error if invalid data',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'success', type: 'boolean', default: false),
+            new OA\Property(property: 'code', type: 'integer'),
+            new OA\Property(
+                property: 'item',
+                ref: new Model(type: {%entityName%}::class, groups: ["put"])
+            ),
+        ]
+    )
+)]
+#[OA\Response(
+    response: 400,
+    description: 'Returns error if invalid data',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'success', type: 'boolean', default: false),
+            new OA\Property(property: 'code', type: 'integer'),
+            new OA\Property(property: 'message', type: 'integer'),
+            new OA\Property(property: 'errors', type: 'array', items: new OA\Items(type: 'string'))
+        ]
+    )
+)]
+#[OA\Response(
+    response: 417,
+    description: 'Returns error',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'success', type: 'boolean', default: false),
+            new OA\Property(property: 'code', type: 'integer'),
+            new OA\Property(property: 'message', type: 'integer'),
+        ]
+    )
+)]
 #[Security(name: 'Bearer')]
 #[OA\Tag(name: '{%lModuleName%}')]
 #[Route(path: '/v1/{%lModuleName%}/{id<\d+>}', name: '{%lModuleName%}Put', methods: Request::METHOD_PUT)]
@@ -30,6 +67,9 @@ class PutController extends BaseController
     final public function __invoke(int $id, Request $request, {%entityName%}Service $service): Response
     {
         try {
+            //Check access
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
             $repository = $service->getRepository();
             if (!$repository instanceof GetItemForPutInterface) {
                 throw new Exception('Repository not implements GetItemForPutInterface');

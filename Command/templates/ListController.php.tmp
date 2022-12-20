@@ -35,7 +35,7 @@ use Symfony\Component\Routing\Annotation\Route;
     )
 )]
 #[OA\Response(
-    response: 500,
+    response: 417,
     description: 'Returns error',
     content: new OA\JsonContent(
         properties: [
@@ -82,6 +82,9 @@ class ListController extends BaseController
     final public function __invoke(Request $request, {%entityName%}Service $service): Response
     {
         try {
+            //Check access
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
             $repository = $service->getRepository();
             if (!$repository instanceof PaginatorInterface) {
                 throw new Exception('Repository not implements PaginatorInterface');

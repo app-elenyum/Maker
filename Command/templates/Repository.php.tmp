@@ -1,6 +1,6 @@
 <?php
 
-namespace Module\{%uModuleName%}\Repository;
+namespace Module\{%uModuleName%}\V1\Repository;
 
 use Module\{%uModuleName%}\Entity\{%entityName%};
 use Doctrine\Persistence\ManagerRegistry;

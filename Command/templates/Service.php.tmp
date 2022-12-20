@@ -1,9 +1,8 @@
 <?php
-
-namespace Module\Maker\Command\templates;
+namespace Module\{%uModuleName%}\V1\Service;
 
 use App\Service\BaseService;
-use Module\News\V1\Entity\News;
+use Module\{%uModuleName%}\V1\Entity\{%entityName%};
 
 class {%entityName%}Service extends BaseService
 {

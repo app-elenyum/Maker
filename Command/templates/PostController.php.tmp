@@ -1,6 +1,6 @@
 <?php
 
-namespace Module\News\V1\Controller;
+namespace Module\{%uModuleName%}\V1\Controller;
 
 use App\Controller\BaseController;
 use App\Validator\ValidationException;
@@ -18,7 +18,44 @@ use OpenApi\Attributes as OA;
 #[OA\RequestBody(
     description: 'Model {%lModuleName%} for add data',
     content: new OA\JsonContent(
-        ref: new Model(type: News::class, groups: ["post"])
+        ref: new Model(type: {%entityName%}::class, groups: ["post"])
+    )
+)]
+#[OA\Response(
+    response: 200,
+    description: 'Returns error if invalid data',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'success', type: 'boolean', default: false),
+            new OA\Property(property: 'code', type: 'integer'),
+            new OA\Property(
+                property: 'item',
+                ref: new Model(type: {%entityName%}::class, groups: ["post"])
+            ),
+        ]
+    )
+)]
+#[OA\Response(
+    response: 400,
+    description: 'Returns error if invalid data',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'success', type: 'boolean', default: false),
+            new OA\Property(property: 'code', type: 'integer'),
+            new OA\Property(property: 'message', type: 'integer'),
+            new OA\Property(property: 'errors', type: 'array', items: new OA\Items(type: 'string'))
+        ]
+    )
+)]
+#[OA\Response(
+    response: 417,
+    description: 'Returns error',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'success', type: 'boolean', default: false),
+            new OA\Property(property: 'code', type: 'integer'),
+            new OA\Property(property: 'message', type: 'integer'),
+        ]
     )
 )]
 #[Security(name: 'Bearer')]
@@ -32,6 +69,9 @@ class PostController extends BaseController
     final public function __invoke(Request $request, {%entityName%}Service $service): Response
     {
         try {
+            //Check access
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
             $item = $service->toEntity($request->getContent());
             $service->getEntityManager()->persist($item);
             $service->getEntityManager()->flush();
