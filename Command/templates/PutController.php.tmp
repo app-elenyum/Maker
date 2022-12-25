@@ -76,10 +76,7 @@ class PutController extends BaseController
             }
             $item = $repository->findOneBy(['id' => $id]);
             if ($item === null) {
-                return $this->json([
-                    'success' => false,
-                    'code' => Response::HTTP_NOT_FOUND,
-                ]);
+                throw new UndefinedEntity({%entityName%}::class);
             }
 
             $service->updateEntity($item, $request->getContent());

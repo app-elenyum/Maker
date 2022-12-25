@@ -56,11 +56,7 @@ class GetController extends BaseController
             }
             $item = $repository->getItem($id);
             if ($item === null) {
-                return $this->json([
-                    'success' => false,
-                    'code' => Response::HTTP_NOT_FOUND,
-                    'message' => 'Entity not found'
-                ]);
+               throw new UndefinedEntity({%entityName%}::class, $id);
             }
 
             return $this->json([

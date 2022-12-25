@@ -5,6 +5,7 @@ namespace Module\{%uModuleName%}\V1\Controller;
 use App\Controller\BaseController;
 use App\Repository\GetItemForDeleteInterface;
 use Exception;
+use Module\{%uModuleName%}\V1\Entity\{%entityName%};
 use Module\{%uModuleName%}\V1\Service\{%entityName%}Service;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,21 +65,21 @@ class DeleteController extends BaseController
 
             $items = $repository->getItemsForDelete($allId);
             if (empty($items)) {
-                return $this->json([
-                    'success' => false,
-                    'code' => Response::HTTP_NOT_FOUND,
-                    'message' => 'Entity not found'
-                ]);
+                throw new UndefinedEntity({%entityName%}::class, $id);
             }
+            $deletedId = [];
             foreach ($items as $item) {
-                $service->getEntityManager()->remove($item);
+                if ($item instanceof {%entityName%}) {
+                    $deletedId[] = $item->getId();
+                    $service->getEntityManager()->remove($item);
+                }
             }
             $service->getEntityManager()->flush();
 
             return $this->json([
                 'success' => true,
                 'code' => Response::HTTP_OK,
-                'id' => $allId,
+                'id' => $deletedId,
             ]);
         } catch (Exception $e) {
             return $this->json([
