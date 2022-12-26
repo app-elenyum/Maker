@@ -46,7 +46,7 @@ use OpenApi\Attributes as OA;
     schema: new OA\Schema(type: 'object'),
     example: [1,2,3]
 )]
-#[Security(name: 'Bearer')]
+#[Security(name: null)]
 #[OA\Tag(name: '{%lModuleName%}', description: 'Delete a REST API resource')]
 #[Route('/v1/{%lModuleName%}/{id}', name: '{%lModuleName%}Delete', methods: Request::METHOD_DELETE)]
 class DeleteController extends BaseController

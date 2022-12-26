@@ -59,7 +59,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
         ]
     )
 )]
-#[Security(name: 'Bearer')]
+#[Security(name: null)]
 #[OA\Tag(name: '{%lModuleName%}')]
 #[Route(path: '/v1/{%lModuleName%}/{id<\d+>}', name: '{%lModuleName%}Put', methods: Request::METHOD_PUT)]
 class PutController extends BaseController

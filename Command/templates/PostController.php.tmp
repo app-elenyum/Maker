@@ -58,7 +58,7 @@ use OpenApi\Attributes as OA;
         ]
     )
 )]
-#[Security(name: 'Bearer')]
+#[Security(name: null)]
 #[OA\Tag(name: '{%lModuleName%}')]
 #[Route(path: '/v1/{%lModuleName%}', name: '{%lModuleName%}Post', methods: Request::METHOD_POST)]
 class PostController extends BaseController
