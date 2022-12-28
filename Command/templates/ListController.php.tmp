@@ -75,7 +75,7 @@ use Symfony\Component\Routing\Annotation\Route;
     schema: new OA\Schema(type: 'string')
 )]
 #[Security(name: null)]
-#[OA\Tag(name: '{%lModuleName%}')]
+#[OA\Tag(name: '{%uModuleName%}')]
 #[Route(path: '/v1/{%lModuleName%}', name: '{%lModuleName%}List', methods: Request::METHOD_GET)]
 class ListController extends BaseController
 {

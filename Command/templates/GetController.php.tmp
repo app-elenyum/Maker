@@ -5,6 +5,8 @@ namespace Module\{%uModuleName%}\V1\Controller;
 use App\Controller\BaseController;
 use App\Repository\GetItemInterface;
 use Exception;
+use App\Exception\UndefinedEntity;
+use App\Entity\BaseEntity;
 use Module\{%uModuleName%}\V1\Entity\{%entityName%};
 use Module\{%uModuleName%}\V1\Service\{%entityName%}Service;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -16,14 +18,14 @@ use OpenApi\Attributes as OA;
 
 #[OA\Response(
     response: 200,
-    description: 'Get model {%lModuleName%}',
+    description: 'Get item {%lModuleName%} by id',
     content: new OA\JsonContent(
         properties: [
             new OA\Property(property: 'success', type: 'boolean', default: true),
             new OA\Property(property: 'code', type: 'integer', default: 200),
             new OA\Property(
                 property: 'item',
-                ref: new Model(type: {%entityName%}::class, groups: ["list"])
+                ref: new Model(type: {%entityName%}::class, groups: ["get"])
             ),
         ]
     )
@@ -40,7 +42,7 @@ use OpenApi\Attributes as OA;
     )
 )]
 #[Security(name: null)]
-#[OA\Tag(name: '{%lModuleName%}')]
+#[OA\Tag(name: '{%uModuleName%}')]
 #[Route(path: '/v1/{%lModuleName%}/{id<\d+>}', name: '{%lModuleName%}Get', methods: Request::METHOD_GET)]
 class GetController extends BaseController
 {
@@ -55,14 +57,14 @@ class GetController extends BaseController
                 throw new Exception('Repository not implements GetItemInterface');
             }
             $item = $repository->getItem($id);
-            if ($item === null) {
-               throw new UndefinedEntity({%entityName%}::class, $id);
+            if (!$item instanceof BaseEntity) {
+               throw new UndefinedEntity({%entityName%}::class . ' or not extend BaseEntity', $id);
             }
 
             return $this->json([
                 'success' => true,
                 'code' => Response::HTTP_OK,
-                'item' => $item,
+                'item' => $item->toArray('get'),
             ]);
         } catch (Exception $e) {
             return $this->json([

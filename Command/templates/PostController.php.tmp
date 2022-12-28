@@ -5,6 +5,8 @@ namespace Module\{%uModuleName%}\V1\Controller;
 use App\Controller\BaseController;
 use App\Validator\ValidationException;
 use Exception;
+use App\Exception\UndefinedEntity;
+use App\Entity\BaseEntity;
 use Module\{%uModuleName%}\V1\Entity\{%entityName%};
 use Module\{%uModuleName%}\V1\Service\{%entityName%}Service;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -30,7 +32,7 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'code', type: 'integer'),
             new OA\Property(
                 property: 'item',
-                ref: new Model(type: {%entityName%}::class, groups: ["post"])
+                ref: new Model(type: {%entityName%}::class, groups: ["get"])
             ),
         ]
     )
@@ -59,7 +61,7 @@ use OpenApi\Attributes as OA;
     )
 )]
 #[Security(name: null)]
-#[OA\Tag(name: '{%lModuleName%}')]
+#[OA\Tag(name: '{%uModuleName%}')]
 #[Route(path: '/v1/{%lModuleName%}', name: '{%lModuleName%}Post', methods: Request::METHOD_POST)]
 class PostController extends BaseController
 {
@@ -73,13 +75,16 @@ class PostController extends BaseController
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
 
             $item = $service->toEntity($request->getContent());
+            if (!$item instanceof BaseEntity) {
+               throw new UndefinedEntity({%entityName%}::class . ' or not extend BaseEntity', $id);
+            }
             $service->getEntityManager()->persist($item);
             $service->getEntityManager()->flush();
 
             return $this->json([
                 'success' => true,
                 'code' => Response::HTTP_OK,
-                'item' => $item,
+                'item' => $item->toArray('get'),
             ]);
         } catch (ValidationException $e) {
             return $this->json([

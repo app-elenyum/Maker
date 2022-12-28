@@ -70,6 +70,12 @@ class CreateModule extends Command
             [ucfirst($moduleName), lcfirst($moduleName), $nameEntity, $nameRepository]
         );
 
+        $this->copyTemplateToModule(
+            $moduleName, 'README.md', 'README.md', '/',
+            ['{%lModuleName%}'],
+            [lcfirst($moduleName)]
+        );
+
         $controllers = [
             'DeleteController.php',
             'GetController.php',

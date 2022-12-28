@@ -6,6 +6,8 @@ use App\Controller\BaseController;
 use App\Repository\GetItemForPutInterface;
 use App\Validator\ValidationException;
 use Exception;
+use App\Exception\UndefinedEntity;
+use App\Entity\BaseEntity;
 use Module\{%uModuleName%}\V1\Entity\{%entityName%};
 use Module\{%uModuleName%}\V1\Service\{%entityName%}Service;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +19,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 
 //Update a REST API resource
 #[OA\RequestBody(
-    description: 'Model {%lModuleName%} for update data',
+    description: 'Model {%lModuleName%} for update data by id',
     content: new OA\JsonContent(
         ref: new Model(type: {%entityName%}::class, groups: ["put"])
     )
@@ -31,7 +33,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
             new OA\Property(property: 'code', type: 'integer'),
             new OA\Property(
                 property: 'item',
-                ref: new Model(type: {%entityName%}::class, groups: ["put"])
+                ref: new Model(type: {%entityName%}::class, groups: ["get"])
             ),
         ]
     )
@@ -60,7 +62,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
     )
 )]
 #[Security(name: null)]
-#[OA\Tag(name: '{%lModuleName%}')]
+#[OA\Tag(name: '{%uModuleName%}')]
 #[Route(path: '/v1/{%lModuleName%}/{id<\d+>}', name: '{%lModuleName%}Put', methods: Request::METHOD_PUT)]
 class PutController extends BaseController
 {
@@ -75,8 +77,8 @@ class PutController extends BaseController
                 throw new Exception('Repository not implements GetItemForPutInterface');
             }
             $item = $repository->findOneBy(['id' => $id]);
-            if ($item === null) {
-                throw new UndefinedEntity({%entityName%}::class);
+            if (!$item instanceof BaseEntity) {
+               throw new UndefinedEntity({%entityName%}::class . ' or not extend BaseEntity', $id);
             }
 
             $service->updateEntity($item, $request->getContent());
@@ -85,7 +87,7 @@ class PutController extends BaseController
             return $this->json([
                 'success' => true,
                 'code' => Response::HTTP_OK,
-                'item' => $item,
+                'item' => $item->toArray('put'),
             ]);
         } catch (ValidationException $e) {
             return $this->json([

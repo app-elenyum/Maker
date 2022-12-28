@@ -2,9 +2,12 @@
 
 namespace Module\{%uModuleName%}\V1\Controller;
 
+use App\Entity\BaseEntity;
 use App\Controller\BaseController;
 use App\Repository\GetItemForDeleteInterface;
 use Exception;
+use App\Exception\UndefinedEntity;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Module\{%uModuleName%}\V1\Entity\{%entityName%};
 use Module\{%uModuleName%}\V1\Service\{%entityName%}Service;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,9 +24,8 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'success', type: 'boolean', default: true),
             new OA\Property(property: 'code', type: 'integer', default: 200),
             new OA\Property(
-                property: 'id',
-                type: 'array',
-                items: new OA\Items(default: [1,2,3])
+                property: 'items',
+                ref: new Model(type: {%entityName%}::class, groups: ["del"])
             ),
         ]
     )
@@ -47,7 +49,7 @@ use OpenApi\Attributes as OA;
     example: [1,2,3]
 )]
 #[Security(name: null)]
-#[OA\Tag(name: '{%lModuleName%}', description: 'Delete a REST API resource')]
+#[OA\Tag(name: '{%uModuleName%}', description: 'Delete a REST API resource')]
 #[Route('/v1/{%lModuleName%}/{id}', name: '{%lModuleName%}Delete', methods: Request::METHOD_DELETE)]
 class DeleteController extends BaseController
 {
@@ -67,11 +69,13 @@ class DeleteController extends BaseController
             if (empty($items)) {
                 throw new UndefinedEntity({%entityName%}::class, $id);
             }
-            $deletedId = [];
+            $deletedItems = [];
             foreach ($items as $item) {
-                if ($item instanceof {%entityName%}) {
-                    $deletedId[] = $item->getId();
+                if ($item instanceof BaseEntity) {
+                    $deletedItems[] = $item->toArray('del');
                     $service->getEntityManager()->remove($item);
+                } else {
+                    throw new UndefinedEntity({%entityName%}::class . ' or not extend BaseEntity');
                 }
             }
             $service->getEntityManager()->flush();
@@ -79,7 +83,7 @@ class DeleteController extends BaseController
             return $this->json([
                 'success' => true,
                 'code' => Response::HTTP_OK,
-                'id' => $deletedId,
+                'items' => $deletedItems,
             ]);
         } catch (Exception $e) {
             return $this->json([

@@ -2,21 +2,30 @@
 
 namespace Module\{%uModuleName%}\V1\Entity;
 
-use JsonSerializable;
+use App\Entity\BaseEntity;
 use Doctrine\ORM\Mapping as ORM;
-use Module\{%uModuleName%}\Repository\{%repositoryName%};
+use Module\{%uModuleName%}\V1\Repository\{%repositoryName%};
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: {%repositoryName%}::class)]
 #[ORM\Table(name: '{%lModuleName%}')]
-class {%entityName%} implements JsonSerializable
+class {%entityName%} extends BaseEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["get", "list", "post", "put"])]
+    #[Groups(['get', 'list', 'post', 'put', 'del'])]
     private int $id;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
+    #[Groups(['get', 'list'])]
+    private DateTimeImmutable $createdAt;
+
+    public function __construct()
+    {
+        $this->setCreatedAt(new DateTimeImmutable());
+    }
 
     /**
      * @return int
@@ -35,12 +44,19 @@ class {%entityName%} implements JsonSerializable
     }
 
     /**
-     * @return array
+     * @return DateTimeImmutable
      */
-    public function jsonSerialize(): array
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return [
-            'id' => $this->getId(),
-        ];
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTimeImmutable $createdAt
+     * @return void
+     */
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }
