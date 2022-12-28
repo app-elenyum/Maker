@@ -2,6 +2,7 @@
 
 namespace Module\Maker\Command;
 
+use Module\Maker\ConfigEditor;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,7 +12,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Yaml\Yaml;
 
 #[AsCommand(
     name: 'module:create',
@@ -120,8 +120,8 @@ class CreateModule extends Command
 
     private function addDoctrineConfigure(string $moduleName): void
     {
-        $configDoctrine = __DIR__.'/../../../config/packages/doctrine.yaml';
-        $value = Yaml::parseFile($configDoctrine);
+        $config = new ConfigEditor('config/packages/doctrine.yaml');
+        $value = $config->parse();
         $value['doctrine']['dbal']['connections'][lcfirst($moduleName)]['url'] = "%env(resolve:DATABASE_URL)%";
         $value['doctrine']['orm']['entity_managers'][lcfirst($moduleName)] = [
             "connection" => lcfirst($moduleName),
@@ -136,7 +136,7 @@ class CreateModule extends Command
             ],
         ];
 
-        file_put_contents($configDoctrine, Yaml::dump($value, 10));
+        $config->save($value);
     }
 
     private function createDir(string $dirPath, string $dirName): void

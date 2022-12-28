@@ -2,13 +2,13 @@
 
 namespace Module\Maker\Command;
 
+use Module\Maker\ConfigEditor;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 
 #[AsCommand(
     name: 'module:install',
@@ -30,7 +30,8 @@ class InstallModule extends Command
         $moduleName = ucfirst($input->getArgument('moduleName'));
 
         $token = $_ENV['GITHUB_TOKEN'] ?? $input->getOption('token');
-        $command = "git clone https://{$token}@github.com/elenyum-ru/{$moduleName}.git ". __DIR__ ."/../../{$moduleName}";
+        $modulePath = __DIR__."/../../{$moduleName}";
+        $command = "git clone https://{$token}@github.com/elenyum-ru/{$moduleName}.git ".$modulePath;
 
         shell_exec($command);
         $this->addDoctrineConfigure($moduleName);
@@ -42,8 +43,8 @@ class InstallModule extends Command
 
     private function addDoctrineConfigure(string $moduleName): void
     {
-        $configDoctrine = __DIR__.'/../../../config/packages/doctrine.yaml';
-        $value = Yaml::parseFile($configDoctrine);
+        $config = new ConfigEditor('config/packages/doctrine.yaml');
+        $value = $config->parse();
         $value['doctrine']['dbal']['connections'][lcfirst($moduleName)]['url'] = "%env(resolve:DATABASE_URL)%";
         $value['doctrine']['orm']['entity_managers'][lcfirst($moduleName)] = [
             "connection" => "users",
@@ -58,6 +59,6 @@ class InstallModule extends Command
             ],
         ];
 
-        file_put_contents($configDoctrine, Yaml::dump($value, 10));
+        $config->save($value);
     }
 }
